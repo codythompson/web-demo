@@ -2,6 +2,9 @@
 /*
  * Creates a web page by adding all of the necessary HTML
  *
+ * basically echos the information given from the parameters in appropriate
+ * locations in an HTML shell.
+ *
  * title - the title of the website
  *         placed inside the HTML title tag in the header
  *
