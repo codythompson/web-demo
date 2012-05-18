@@ -1,0 +1,44 @@
+/* just floats left */
+.slider-left {
+    float:left;
+}
+
+/* just clears */
+.slider-clear {
+    clear:both;
+}
+
+/* sets the width and height of the slider left/right buttons*/
+.slider-button {
+    width:36px;
+    height:128px;
+}
+
+/* sets the background image of the buttons to be left and right arrows*/
+.slider-button-left {
+    background-image:url('../images/leftArrow.png');
+}
+.slider-button-right {
+    background-image:url('../images/rightArrow.png');
+}
+
+/* 
+ * sets the div that holds the slider options to be relatively positioned
+ * so that the slider options are absolutely positioned relative to this div
+ */
+.slider-options {
+    position:relative;
+
+    width:768px;
+    height:128px;
+
+    overflow:hidden;
+}
+
+/*
+ * sets the slider options to be absolutely positioned so that their location
+ * can be changed on a pixel by pixel basis 
+ */
+.slider-option {
+    position:absolute;
+}
