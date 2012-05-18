@@ -14,6 +14,30 @@ var slider_updateInterval = 17;
 var slider_updateDeltaX = 24;
 
 /*
+ * utility functions
+ */
+/*
+ * returns a string representation of the parameter with 'px' added to the end.
+ */
+function slider_intToPx (num) {
+  num = Number(num);
+  num = num.toString();
+  return num + 'px';
+}
+
+/*
+ * returns an item id string based on the given base id and index
+ */
+function slider_getItemId (baseId, itemIx) {
+  var eleId = new Number(itemIx);
+  eleId = baseId + '-' + eleId.toString();
+  return eleId;
+}
+
+/*
+ * Core functionality
+ */
+/*
  * creates a new slider object
  * A slider object will change the position of a set of absolutely positioned
  * HTML elements to make them appear as if they are sliding to the left or right
@@ -41,8 +65,9 @@ var slider_updateDeltaX = 24;
  * count -
  * the number of elements/items the slider will be controlling
  *
- * pos - the index of the slider element/item that should be displayed first
- * (0 would be the first element/item listed)
+ * pos -
+ * the position (in pixels) that the left-most visible slider item should be
+ * drawn at.
  */
 function slider_newSlider(baseId, width, count, pos) {
   //initializes the object
@@ -116,48 +141,22 @@ function slider_animation (slider_ix, delt) {
 }
 
 /*
- * returns a string representation of the parameter with 'px' added to the end.
+ * Should be called after a slider object's position has been changed.
+ *
+ * Changes the absolute position of all items belonging to the slider object
+ * based on the slider objects 'pos' value.
+ *
+ * if the slider obj's pos value is > 0
+ *  - the slider items are reordered so the last slider item becomes the first
+ *
+ * if the slider obj's pos value is less than one item width less than zero
+ *  - the slider items are reordered so the first slider item becomes the last
  */
-function slider_intToPx (num) {
-  num = Number(num);
-  num = num.toString();
-  return num + 'px';
-}
-
-/*
- * returns an item id string based on the given base id and index
- */
-function slider_getItemId (baseId, itemIx) {
-  var eleId = new Number(itemIx);
-  eleId = baseId + '-' + eleId.toString();
-  return eleId;
-}
-
-function slider_left (slider_ix) {
-  var slider_obj = slider_objs[slider_ix];
-  if (!slider_curAni) {
-    slider_curAni = new slider_animation (slider_ix, slider_updateDeltaX);
-    slider_curAni.update()
-  }
-}
-
-function slider_right (slider_ix) {
-  var slider_obj = slider_objs[slider_ix];
-  if (!slider_curAni) {
-    slider_curAni = new slider_animation (slider_ix, 0 - slider_updateDeltaX);
-    slider_curAni.update()
-  }
-}
-
 function slider_move(slider_obj) {
-  var i = 0;
-  for (i = 0; i < slider_obj.count; i++) {
-    var pos = (i * slider_obj.width) + slider_obj.pos;
-    pos = slider_intToPx(pos);
-    var eleId = slider_getItemId(slider_obj.baseId, i);
-    document.getElementById(eleId).style.left = pos;
-  }
+  //if the slider_obj position is > 0, it's time to re-order everything.
   if (slider_obj.pos > 0) {
+      
+    //this loops renames every item's id to reflect the change in ordering
     var eleId = slider_getItemId(slider_obj.baseId, 0);
     document.getElementById(eleId).id = "slider_temp";
 
@@ -171,9 +170,15 @@ function slider_move(slider_obj) {
     document.getElementById("slider_temp").id =
         slider_getItemId(slider_obj.baseId, 0);
 
+    //resets the slider_obj's position.
     slider_obj.pos = slider_obj.pos - slider_obj.width;
   }
-  if (slider_obj.pos <= 0 - slider_obj.width) {
+
+  //if the slider_obj position less than one items width less than zero
+  //it's time to re-order everything.
+  else if (slider_obj.pos <= 0 - slider_obj.width) {
+
+    //this loop renames every item's id to reflect the change in ordering
     var eleId = slider_getItemId(slider_obj.baseId, slider_obj.count - 1);
     document.getElementById(eleId).id = "slider_temp";
 
@@ -186,6 +191,46 @@ function slider_move(slider_obj) {
 
     document.getElementById("slider_temp").id =
         slider_getItemId(slider_obj.baseId, slider_obj.count - 1);
+
+    //resets the slider_obj's position
     slider_obj.pos = slider_obj.pos + slider_obj.width;
+  }
+
+  //sets the absolute position of every item the slider is in charge of
+  var i = 0;
+  for (i = 0; i < slider_obj.count; i++) {
+    var pos = (i * slider_obj.width) + slider_obj.pos;
+    pos = slider_intToPx(pos);
+    var eleId = slider_getItemId(slider_obj.baseId, i);
+    document.getElementById(eleId).style.left = pos;
+  }
+}
+
+/*
+ * Interface functions
+ * 
+ * The following functions are how the buttons interface with this script
+ */
+/*
+ * Starts an animation that moves all of the elements/items of the given slider
+ * one item-width to the left.
+ */
+function slider_left (slider_ix) {
+  var slider_obj = slider_objs[slider_ix];
+  if (!slider_curAni) {
+    slider_curAni = new slider_animation (slider_ix, slider_updateDeltaX);
+    slider_curAni.update()
+  }
+}
+
+/*
+ * Starts an animation that moves all of the elements/items of the given slider
+ * one item-width to the right.
+ */
+function slider_right (slider_ix) {
+  var slider_obj = slider_objs[slider_ix];
+  if (!slider_curAni) {
+    slider_curAni = new slider_animation (slider_ix, 0 - slider_updateDeltaX);
+    slider_curAni.update()
   }
 }
